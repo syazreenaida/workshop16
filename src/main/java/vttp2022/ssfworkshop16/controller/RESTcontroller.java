@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 // import org.springframework.web.bind.annotation.ModelAttribute; <---used in SSFworkshop14
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ public class RESTcontroller {
     redisService service;
 
     @GetMapping("/api/boardgame/{boardGame}")
-    public ResponseEntity<String> get(@PathVariable(value="boardGame") String boardGame){
+    public ResponseEntity<String> getBoardGame(@PathVariable(value="boardGame") String boardGame){
         // User user = userSvc.get(userId);
         // JsonObject resp = Json.createObjectBuilder()
         //                         .add("name", user.getName())
@@ -37,7 +38,7 @@ public class RESTcontroller {
     }
 
     @PostMapping(path="/api/boardgame", consumes="checkers/json")
-    public ResponseEntity<String> postUser(@RequestBody String payload) {
+    public ResponseEntity<String> postDoc(@RequestBody String payload) {
         JsonObject body;
 
         try (InputStream is = new ByteArrayInputStream(payload.getBytes())) {
@@ -46,7 +47,7 @@ public class RESTcontroller {
             JsonObject response = Json.createObjectBuilder()
                                         .add("insert_count",1).build();
                                         // .add("id",<Redis Key>).build();
-            return ResponseEntity.internalServerError().body(response.toString());
+            return ResponseEntity.created(null).body(response.toString());
 
         } catch (Exception e) {
             body = Json.createObjectBuilder()
@@ -54,6 +55,30 @@ public class RESTcontroller {
         return ResponseEntity.internalServerError().body(body.toString());
 
         }
+    }
+    
+    // TODO PutMapping 
+    @PutMapping("/api/boardgame/{boardGame}")
+    public ResponseEntity<String> updDoc(@PathVariable(value="boardGame") @RequestBody String payload){
+        JsonObject body;
+        Boolean upsert = false;
+        if (!upsert){
+            try (InputStream is = new ByteArrayInputStream(payload.getBytes())) {
+                JsonReader reader = Json.createReader(is);
+                body = reader.readObject();
+                JsonObject response = Json.createObjectBuilder()
+                                            .add("update_count",1).build();
+                                            // .add("id",<Redis Key>).build();
+                return ResponseEntity.created(null).body(response.toString() + " 200 file successfully updated");
+    
+            } catch (Exception e) {
+                body = Json.createObjectBuilder()
+                            .add("400 file not found", e.getMessage()).build();
+            return ResponseEntity.internalServerError().body(body.toString());
+    
+            }
+        }
+        return null;  //TODO method
     }
 
 
