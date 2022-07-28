@@ -1,0 +1,101 @@
+POST http://localhost:8080/board-game HTTP/1.1
+content-type: application/json
+
+{
+    "name": "checkers",
+    "pieces": {
+        "rulebook": {
+            "total_count": 1,
+            "file": "rulebook-checkers.pdf"
+        },
+        "board": {
+            "total_count": 1,
+            "squares": {
+                "total_count": 64,
+                "types": [
+                    {
+                        "type": "dark",
+                        "count": 32
+                    },
+                    {
+                        "type": "light",
+                        "count": 32
+                    }
+                ]
+            }
+        },
+        "discs": {
+            "total_count": 32,
+            "types": [
+                {
+                    "type": "dark",
+                    "count": 12
+                },
+                {
+                    "type": "light",
+                    "count": 12
+                }
+            ]
+        }
+    }
+}
+
+###
+GET http://localhost:8080/board-game/633f2a8e HTTP/1.1
+Content-Type: application/json
+
+###
+PUT http://localhost:8080/board-game/861015ed HTTP/1.1
+content-type: application/json
+
+{
+    "name": "checkers",
+    "pieces": {
+        "rulebook": {
+            "total_count": 1,
+            "file": "rulebook-checkers.pdf"
+        },
+        "board": {
+            "total_count": 1,
+            "squares": {
+                "total_count": 64,
+                "types": [
+                    {
+                        "type": "dark",
+                        "count": 32
+                    },
+                    {
+                        "type": "light",
+                        "count": 32
+                    }
+                ]
+            }
+        },
+        "discs": {
+            "total_count": 32,
+            "types": [
+                {
+                    "type": "dark",
+                    "count": 12
+                },
+                {
+                    "type": "light",
+                    "count": 12
+                }
+            ]
+        }
+    },
+    "id": "861015ed",
+    "insertCount": 0,
+    "updateCount": 0,
+    "upsert": false
+}
+
+###
+
+GET http://localhost:8080/board-game/d4d4e2b1 HTTP/1.1
+content-type: application/json
+
+###
+GET http://localhost:8080/board-game/list HTTP/1.1
+content-type: application/json
