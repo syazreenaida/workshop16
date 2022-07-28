@@ -1,11 +1,14 @@
 package vttp2022.ssfworkshop16.services;
 
 import jakarta.json.JsonObject;
+import vttp2022.ssfworkshop16.model.Welcome4;
 
 public interface repo{
-    public void save(JsonObject body);
+    public int save(JsonObject body);
 
-    public String BoardGame(String boardGame);
+    public Welcome4 BoardGame(String boardGame);
+
+    public int update(JsonObject body);
 }
 
 

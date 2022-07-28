@@ -11,8 +11,9 @@ import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import vttp2022.ssfworkshop16.model.Welcome4;
 
 @Configuration
 public class redisConfig {
@@ -21,25 +22,30 @@ public class redisConfig {
     private String redisHost;
     @Value("${spring.redis.port}")
     private Optional<Integer> redisPort;
+    @Value("${spring.redis.password}")
+    private String redisPassword;
+    @Value("${spring.redis.database}")
+    private String redisDatabase;
 
     @Bean
     @Scope("singleton") // This is the default scope
-    public RedisTemplate<String, Object> createRedisTemplate(){
+    public RedisTemplate<String, Welcome4> createRedisTemplate(){
 
         final RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setPort(redisPort.get());
         config.setHostName(redisHost);
+        config.setPassword(redisPassword);
 
         final JedisClientConfiguration jedisClient = JedisClientConfiguration.builder().build();
         final JedisConnectionFactory jedisFac = new JedisConnectionFactory(config, jedisClient);
         jedisFac.afterPropertiesSet();
 
-        RedisTemplate<String, Object> template = new RedisTemplate();
+        RedisTemplate<String, Welcome4> template = new RedisTemplate<String,Welcome4>();
         template.setConnectionFactory(jedisFac);
         template.setKeySerializer(new StringRedisSerializer());
 
-        final RedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer(getClass());
-        template.setValueSerializer(serializer);
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Welcome4.class);
+        template.setValueSerializer(jackson2JsonRedisSerializer);
         return template;
         
     }

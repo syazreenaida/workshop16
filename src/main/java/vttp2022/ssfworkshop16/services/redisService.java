@@ -7,27 +7,45 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import jakarta.json.JsonObject;
+import vttp2022.ssfworkshop16.model.Welcome4;
 
 @Service
 public class redisService implements repo{
     private static final Logger logger = LoggerFactory.getLogger(redisService.class);
 
     @Autowired
-    RedisTemplate <String, Object> redisTemplate;
+    RedisTemplate <String, Welcome4> redisTemplate;
 
     @Override
-    public void save(JsonObject body) {
-        redisTemplate.opsForValue().set("boardgame", body.toString());
-        
+    public int save(JsonObject body) {
+        redisTemplate.opsForValue().set(((Welcome4) body).getId(), (Welcome4) body);
+        Welcome4 result = (Welcome4) redisTemplate.opsForValue();
+        if (result !=null)
+            return 1;
+        return 0;
     }
 
     @Override
-    public String BoardGame(String boardGame) {
-        String string = (String) redisTemplate.opsForValue().get(boardGame);
+    public Welcome4 BoardGame(String boardGame) {
+        Welcome4 string = (Welcome4) redisTemplate.opsForValue().get(boardGame);
         logger.info(">>> " + string + "chosen");
         return string;
     }
+
+    @Override
+    public int update(JsonObject body) {
+        if (((Welcome4) body).isUpsert())
+            redisTemplate.opsForValue().setIfAbsent(((Welcome4) body).getId(), (Welcome4) body);
+        else
+            redisTemplate.opsForValue().setIfPresent(((Welcome4) body).getId(), (Welcome4) body);
+        Welcome4 result = (Welcome4) redisTemplate.opsForValue().get(((Welcome4) body).getId());
+        if (result != null)
+            return 1;
+        return 0;
+    }
+        
 }
+
 
 //Sample Reference from SSFworkshop14
 // @Service

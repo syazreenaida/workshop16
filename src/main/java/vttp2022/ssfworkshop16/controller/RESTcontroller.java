@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
+import vttp2022.ssfworkshop16.model.Welcome4;
 import vttp2022.ssfworkshop16.services.redisService;
 
 @RestController
@@ -29,57 +30,65 @@ public class RESTcontroller {
     redisService service;
 
     @GetMapping("/api/boardgame/{boardGame}")
-    public ResponseEntity<String> getBoardGame(@PathVariable(value="boardGame") String boardGame){
-        // User user = userSvc.get(userId);
+    public ResponseEntity<Welcome4> getBoardGame(@PathVariable(value="boardGame") String boardGame){
+        Welcome4 w4 = service.BoardGame(boardGame);
         // JsonObject resp = Json.createObjectBuilder()
         //                         .add("name", user.getName())
         //                         .build();
-        return null;
+        return ResponseEntity.ok(w4);
     }
 
     @PostMapping(path="/api/boardgame", consumes="checkers/json")
-    public ResponseEntity<String> postDoc(@RequestBody String payload) {
-        JsonObject body;
-
-        try (InputStream is = new ByteArrayInputStream(payload.getBytes())) {
+    public ResponseEntity<Welcome4> createBoardGameSession(@RequestBody Welcome4 welcome4) {
+        try (InputStream is = new ByteArrayInputStream(((Welcome4) welcome4).getPieces())) {
+            JsonObject body;
             JsonReader reader = Json.createReader(is);
             body = reader.readObject();
             JsonObject response = Json.createObjectBuilder()
                                         .add("insert_count",1).build();
                                         // .add("id",<Redis Key>).build();
-            return ResponseEntity.created(null).body(response.toString());
+            return ResponseEntity.ok(welcome4);
 
         } catch (Exception e) {
-            body = Json.createObjectBuilder()
-                        .add("404 file not found", e.getMessage()).build();
-        return ResponseEntity.internalServerError().body(body.toString());
+            System.out.println(e); 
+            
+        }
+        return null;
+    }
 
-        }
+    @PutMapping(path = "/{boardGame}")
+    public ResponseEntity<JsonObject> updateGameBoard(@RequestBody JsonObject welcome4, @PathVariable JsonObject boardGame) {
+        int w4Result = service.update(welcome4);
+        if (w4Result > 0) ((Welcome4) welcome4).setUpdateCount(w4Result);
+        return ResponseEntity.ok(welcome4);
     }
+}  
+
+
+
+    // // TODO PutMapping 
+    // @PutMapping("/api/boardgame/{boardGame}")
+    // public ResponseEntity<Welcome4> updateBoardGameSession(@PathVariable(value="boardGame") @RequestBody Welcome4 welcome4){
+    //     JsonObject body;
+    //     Boolean upsert = false;
+    //     if (!upsert){
+    //         try (InputStream is = new ByteArrayInputStream(payload.getBytes())) {
+    //             JsonReader reader = Json.createReader(is);
+    //             body = reader.readObject();
+    //             JsonObject response = Json.createObjectBuilder()
+    //                                         .add("update_count",1).build();
+    //                                         // .add("id",<Redis Key>).build();
+    //             return ResponseEntity.created(null).body(response.toString() + " 200 file successfully updated");
     
-    // TODO PutMapping 
-    @PutMapping("/api/boardgame/{boardGame}")
-    public ResponseEntity<String> updDoc(@PathVariable(value="boardGame") @RequestBody String payload){
-        JsonObject body;
-        Boolean upsert = false;
-        if (!upsert){
-            try (InputStream is = new ByteArrayInputStream(payload.getBytes())) {
-                JsonReader reader = Json.createReader(is);
-                body = reader.readObject();
-                JsonObject response = Json.createObjectBuilder()
-                                            .add("update_count",1).build();
-                                            // .add("id",<Redis Key>).build();
-                return ResponseEntity.created(null).body(response.toString() + " 200 file successfully updated");
+    //         } catch (Exception e) {
+    //             body = Json.createObjectBuilder()
+    //                         .add("400 file not found", e.getMessage()).build();
+    //         return ResponseEntity.internalServerError().body(body.toString());
     
-            } catch (Exception e) {
-                body = Json.createObjectBuilder()
-                            .add("400 file not found", e.getMessage()).build();
-            return ResponseEntity.internalServerError().body(body.toString());
-    
-            }
-        }
-        return null;  //TODO method
-    }
+    //         }
+    //     }
+    //     return null;  //TODO method
+    // }
 
 
     // Sample Reference from SSFWorkshop14 //
@@ -99,4 +108,4 @@ public class RESTcontroller {
     //     return "showContact";
     // }
 
-}
+
